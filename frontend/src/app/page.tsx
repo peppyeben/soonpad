@@ -8,10 +8,10 @@ export default function Home() {
 
 	return (
 		<main className="flex items-center justify-center">
-			<div className="border hover:border-slate-900 rounded">
+			{/* <div className="border hover:border-slate-900 rounded">
 				{isHydrated ? <WalletMultiButton style={{}} /> : null}
 			</div>
-			<h1 className="text-3xl underline">hello world</h1>
+			<h1 className="text-3xl underline">hello world</h1> */}
 		</main>
 	);
 }
