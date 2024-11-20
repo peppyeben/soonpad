@@ -17,36 +17,41 @@ module.exports = {
 		},
 		extend: {
 			colors: {
-				border: "hsl(var(--border))",
-				input: "hsl(var(--input))",
-				ring: "hsl(var(--ring))",
-				background: "hsl(var(--background))",
-				foreground: "hsl(var(--foreground))",
-				primary: {
+				"green--100": "hsl(120, 100%, 90%)",
+				"green--200": "hsl(120, 100%, 82%)",
+				"green--300": "hsl(120, 100%, 28%)",
+				"green--400": "hsl(120, 100%, 8%)",
+
+				"border": "hsl(var(--border))",
+				"input": "hsl(var(--input))",
+				"ring": "hsl(var(--ring))",
+				"background": "hsl(var(--background))",
+				"foreground": "hsl(var(--foreground))",
+				"primary": {
 					DEFAULT: "hsl(var(--primary))",
 					foreground: "hsl(var(--primary-foreground))",
 				},
-				secondary: {
+				"secondary": {
 					DEFAULT: "hsl(var(--secondary))",
 					foreground: "hsl(var(--secondary-foreground))",
 				},
-				destructive: {
+				"destructive": {
 					DEFAULT: "hsl(var(--destructive))",
 					foreground: "hsl(var(--destructive-foreground))",
 				},
-				muted: {
+				"muted": {
 					DEFAULT: "hsl(var(--muted))",
 					foreground: "hsl(var(--muted-foreground))",
 				},
-				accent: {
+				"accent": {
 					DEFAULT: "hsl(var(--accent))",
 					foreground: "hsl(var(--accent-foreground))",
 				},
-				popover: {
+				"popover": {
 					DEFAULT: "hsl(var(--popover))",
 					foreground: "hsl(var(--popover-foreground))",
 				},
-				card: {
+				"card": {
 					DEFAULT: "hsl(var(--card))",
 					foreground: "hsl(var(--card-foreground))",
 				},
@@ -72,5 +77,5 @@ module.exports = {
 			},
 		},
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [import("tailwindcss-animate")],
 };
