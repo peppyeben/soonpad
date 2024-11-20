@@ -1,10 +1,10 @@
 "use client";
 
-import { useHydration } from "@/hooks/hydration";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+// import { useHydration } from "@/hooks/hydration";
+// import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 export default function Home() {
-	const isHydrated = useHydration();
+	// const isHydrated = useHydration();
 
 	return (
 		<main className="flex items-center justify-center">
