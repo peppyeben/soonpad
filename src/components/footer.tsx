@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { IconType } from "react-icons";
 import { ChangeEvent, useState } from "react";
+import { FaTelegramPlane } from "react-icons/fa";
 import {
 	Card,
 	CardDescription,
@@ -8,8 +10,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-
-import { Button } from "./ui/button";
 import {
 	FaDiscord,
 	FaGithub,
@@ -18,8 +18,8 @@ import {
 	FaXTwitter,
 	FaYoutube,
 } from "react-icons/fa6";
-import { IconType } from "react-icons";
-import { FaTelegramPlane } from "react-icons/fa";
+
+import { Button } from "./ui/button";
 
 interface ILink {
 	href: string;
