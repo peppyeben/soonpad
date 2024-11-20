@@ -1,14 +1,12 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
-import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { clusterApiUrl } from "@solana/web3.js";
-
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import "@solana/wallet-adapter-react-ui/styles.css";
-
-// imports here
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import { SolflareWalletAdapter } from "@solana/wallet-adapter-wallets";
+import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
 
 export default function AppWalletProvider({ children }: { children: React.ReactNode }) {
 	const network = WalletAdapterNetwork.Devnet;
@@ -16,7 +14,7 @@ export default function AppWalletProvider({ children }: { children: React.ReactN
 	const wallets = useMemo(
 		() => [
 			// manually add any legacy wallet adapters here
-			// new UnsafeBurnerWalletAdapter(),
+			new SolflareWalletAdapter({ network }),
 		],
 		[network],
 	);
