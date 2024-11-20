@@ -1,14 +1,13 @@
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 
 import { Button } from "./ui/button";
 import {
-	NavigationMenu,
-	NavigationMenuItem,
-	NavigationMenuLink,
-	NavigationMenuList,
-	navigationMenuTriggerStyle,
+    NavigationMenu,
+    NavigationMenuItem,
+    NavigationMenuLink,
+    NavigationMenuList,
+    navigationMenuTriggerStyle,
 } from "./ui/navigation-menu";
 
 const navigationLinks: {
