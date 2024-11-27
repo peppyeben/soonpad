@@ -3,15 +3,8 @@
 import dynamic from "next/dynamic";
 import React, { useEffect, useMemo, useState } from "react";
 import { ImageUploader } from "@/components/image-uploader";
-import {
-    ConnectionProvider,
-    WalletProvider,
-} from "@solana/wallet-adapter-react";
-import {
-    useWallet,
-    useConnection,
-    useAnchorWallet,
-} from "@solana/wallet-adapter-react";
+import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
+import { useWallet, useConnection, useAnchorWallet } from "@solana/wallet-adapter-react";
 import soonpad_idl from "@/utils/soonpad.json";
 import { NightlyWalletAdapter } from "@solana/wallet-adapter-wallets";
 import {
@@ -21,10 +14,7 @@ import {
     SystemProgram,
     SYSVAR_RENT_PUBKEY,
 } from "@solana/web3.js";
-import {
-    ASSOCIATED_TOKEN_PROGRAM_ID,
-    TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
+import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { BN, Program } from "@coral-xyz/anchor";
 import { HelloAnchor } from "@/types/HelloAnchor";
 import { AnchorProvider } from "@project-serum/anchor";
@@ -53,9 +43,7 @@ interface FormData {
     };
 }
 
-const PROGRAM_ID = new PublicKey(
-    process.env.NEXT_PUBLIC_SOONPAD_PROGRAM_ID as string
-);
+export const PROGRAM_ID = new PublicKey(process.env.NEXT_PUBLIC_SOONPAD_PROGRAM_ID as string);
 
 export const CreateTokenLaunchPage: React.FC = () => {
     const [program, setProgram] = useState<Program<HelloAnchor> | null>(null);
@@ -65,20 +53,12 @@ export const CreateTokenLaunchPage: React.FC = () => {
 
     const provider = useMemo(() => {
         if (!wallet) return null;
-        return new AnchorProvider(
-            connection,
-            wallet,
-            AnchorProvider.defaultOptions()
-        );
+        return new AnchorProvider(connection, wallet, AnchorProvider.defaultOptions());
     }, [connection, wallet]);
 
     useEffect(() => {
         if (provider) {
-            const program = new Program(
-                soonpad_idl as HelloAnchor,
-                PROGRAM_ID,
-                provider as any
-            );
+            const program = new Program(soonpad_idl as HelloAnchor, PROGRAM_ID, provider as any);
             setProgram(program);
         }
     }, [provider]);
@@ -107,9 +87,7 @@ export const CreateTokenLaunchPage: React.FC = () => {
     });
 
     const handleChange = (
-        e: React.ChangeEvent<
-            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-        >
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
         const { name, value } = e.target;
 
@@ -161,9 +139,7 @@ export const CreateTokenLaunchPage: React.FC = () => {
             if (typeof obj === "object" && obj !== null) {
                 return Object.fromEntries(
                     Object.entries(obj)
-                        .filter(
-                            ([key, value]) => value !== "" && value !== null
-                        )
+                        .filter(([key, value]) => value !== "" && value !== null)
                         .map(([key, value]) => [key, removeEmptyValues(value)])
                 );
             }
@@ -183,9 +159,7 @@ export const CreateTokenLaunchPage: React.FC = () => {
 
         try {
             const response = await fetch(
-                `${
-                    process.env.NEXT_PUBLIC_SOONPAD_BACKEND_API as string
-                }/launchpad`,
+                `${process.env.NEXT_PUBLIC_SOONPAD_BACKEND_API as string}/launchpad`,
                 {
                     method: "POST",
                     body: JSON.stringify({
@@ -222,38 +196,33 @@ export const CreateTokenLaunchPage: React.FC = () => {
     };
 
     const initTokenLaunch = async (data: any, metadata: any) => {
-        console.log(data);
-
-        const tokenConfig = {
-            name: data.project_token_name,
-            symbol: data.project_token_symbol,
-            uri: metadata,
-            decimals: 9,
-            totalSupply: new BN(
-                data.project_token_total_supply * LAMPORTS_PER_SOL
-            ),
-            tokenRate: new BN(data.token_sale_rate * LAMPORTS_PER_SOL),
-            maxAllocPerWallet: new BN(data.max_alloc * LAMPORTS_PER_SOL),
-            minContributionPerWallet: new BN(
-                data.min_contribution * LAMPORTS_PER_SOL
-            ),
-        };
-
         try {
+            console.log(data);
+
+            const tokenConfig = {
+                name: data.project_token_name,
+                symbol: data.project_token_symbol,
+                uri: metadata,
+                decimals: 9,
+                // totalSupply: new BN(data.project_token_total_supply) * new BN(LAMPORTS_PER_SOL),
+                totalSupply: new BN(data.project_token_total_supply).mul(new BN(LAMPORTS_PER_SOL)),
+                tokenRate: new BN(data.token_sale_rate),
+                maxAllocPerWallet: new BN(data.max_alloc * LAMPORTS_PER_SOL),
+                minContributionPerWallet: new BN(data.min_contribution * LAMPORTS_PER_SOL),
+            };
+
             if (!wallet?.publicKey) {
                 throw new Error("Wallet public key is not available.");
             }
 
-            const [userAccountPDA, userAccountBump] =
-                PublicKey.findProgramAddressSync(
-                    [Buffer.from("useraccount"), wallet.publicKey.toBuffer()],
-                    PROGRAM_ID
-                );
+            const [userAccountPDA, userAccountBump] = PublicKey.findProgramAddressSync(
+                [Buffer.from("useraccount"), wallet.publicKey.toBuffer()],
+                PROGRAM_ID
+            );
 
-            const fetchNullUserAccount =
-                await program?.account.userAccount.fetchNullable(
-                    userAccountPDA
-                );
+            const fetchNullUserAccount = await program?.account.userAccount.fetchNullable(
+                userAccountPDA
+            );
 
             if (fetchNullUserAccount == null) {
                 await program?.methods
@@ -267,12 +236,9 @@ export const CreateTokenLaunchPage: React.FC = () => {
                     .rpc();
             }
 
-            const fetchUserAccount = await program?.account.userAccount.fetch(
-                userAccountPDA
-            );
+            const fetchUserAccount = await program?.account.userAccount.fetch(userAccountPDA);
 
-            const noOfTokenLaunches =
-                fetchUserAccount?.noOfTokenLaunches.toNumber();
+            const noOfTokenLaunches = fetchUserAccount?.noOfTokenLaunches.toNumber();
             const userTokenLaunchBytes = new ArrayBuffer(8);
             const dataView = new DataView(userTokenLaunchBytes);
 
@@ -301,11 +267,7 @@ export const CreateTokenLaunchPage: React.FC = () => {
             const isWLAvailable = data.whitelist_available;
 
             const initTokenLaunch = await program?.methods
-                .initializeTokenLaunch(
-                    tokenConfig,
-                    tokenLaunchMetadata,
-                    isWLAvailable
-                )
+                .initializeTokenLaunch(tokenConfig, tokenLaunchMetadata, isWLAvailable)
                 .accounts({
                     userAccount: userAccountPDA,
                     tokenLaunchpadAccount: tokenLaunchpadAccountPDA,
@@ -323,15 +285,12 @@ export const CreateTokenLaunchPage: React.FC = () => {
             console.log(initTokenLaunch);
 
             const response = await fetch(
-                `${
-                    process.env.NEXT_PUBLIC_SOONPAD_BACKEND_API as string
-                }/launchpad`,
+                `${process.env.NEXT_PUBLIC_SOONPAD_BACKEND_API as string}/launchpad`,
                 {
                     method: "PATCH",
                     body: JSON.stringify({
                         data: {
-                            token_launch_address:
-                                tokenLaunchpadAccountPDA.toBase58(),
+                            token_launch_address: tokenLaunchpadAccountPDA.toBase58(),
                         },
                         doc_id: metadata,
                     }),
@@ -353,10 +312,7 @@ export const CreateTokenLaunchPage: React.FC = () => {
             console.log("Success:", responseData);
 
             if (responseData.success) {
-                console.log(
-                    "Token launch created on program:",
-                    responseData.result
-                );
+                console.log("Token launch created on program:", responseData.result);
             }
         } catch (error) {
             console.log(error);
@@ -370,9 +326,7 @@ export const CreateTokenLaunchPage: React.FC = () => {
 
     return (
         <section className="flex flex-col justify-start items-start w-full px-10">
-            <p className="text-2xl font-bold text-left">
-                Start your token launch on SOONPAD
-            </p>
+            <p className="text-2xl font-bold text-left">Start your token launch on SOONPAD</p>
             <form
                 onSubmit={handleSubmit}
                 className="flex flex-col justify-start items-start w-1/2 py-7 space-y-6 mr-auto"
@@ -445,8 +399,8 @@ export const CreateTokenLaunchPage: React.FC = () => {
                         placeholder="0.1"
                         required
                         name="min_contribution"
-                        pattern="^\d*(\.\d{0,3})?$"
-                        title="Enter a valid number not less than 0.001"
+                        pattern="^\d*(\.\d{0,4})?$"
+                        title="Enter a valid number not less than 0.0001"
                         value={formData.min_contribution}
                         onChange={handleChange}
                     />

@@ -46,10 +46,10 @@ const TokenLaunchSchema = new mongoose.Schema({
                         new BigNumber(v) * LAMPORTS_PER_SOL
                     );
                     return bigNumberValue.isGreaterThanOrEqualTo(
-                        new BigNumber("100") * LAMPORTS_PER_SOL
+                        new BigNumber("5") * LAMPORTS_PER_SOL
                     );
                 },
-                message: "Total supply must be at least 100 lamports",
+                message: "Total supply must be at least 5 lamports",
             },
         ],
     },
