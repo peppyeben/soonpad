@@ -1,0 +1,14 @@
+.eslint
+
+"plugins": [
+        "perfectionist"
+    ],
+    "rules": {
+        "perfectionist/sort-imports": [
+            "error",
+            {
+                "type": "line-length",
+                "order": "asc"
+            }
+        ]
+    }
