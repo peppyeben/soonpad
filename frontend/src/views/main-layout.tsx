@@ -18,7 +18,7 @@ export default function Component({ children }: { children: ReactNode }) {
 	return (
 		<section className={`min-h-screen relative`}>
 			<Header />
-			<main className={`max-w-[80rem] mx-auto pb-[45.5rem] pt-[2.25rem] px-[2rem]`}>
+			<main className={`max-w-[80rem] mx-auto pb-[8.5rem] pt-[2.25rem] px-[2rem]`}>
 				{children}
 			</main>
 			<Footer />
