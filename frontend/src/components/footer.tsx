@@ -190,8 +190,8 @@ export default function Component() {
 			}}
 		>
 			<div className={`px-[2rem] max-w-[80rem] w-full space-y-[5rem]`}>
-				<RenderNewsletter />
-				<RenderFooterLinks />
+				{/* <RenderNewsletter />
+				<RenderFooterLinks /> */}
 				<RenderSocialsAndSettings />
 			</div>
 		</footer>

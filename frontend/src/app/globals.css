@@ -74,3 +74,8 @@
 .desktop-screen-width {
     width: min(96rem, 100%);
 }
+
+.custom-select option {
+    color: #CFFFCF;
+    background-color: rgba(0, 41, 0, 0.8);
+}
