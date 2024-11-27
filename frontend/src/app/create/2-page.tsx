@@ -1,19 +1,16 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import React, { useEffect, useMemo, useState } from "react";
 import { ImageUploader } from "@/components/image-uploader";
 import {
-    ConnectionProvider,
-    WalletProvider,
+    useWallet,
+    useAnchorWallet,
+    useConnection,
 } from "@solana/wallet-adapter-react";
 import {
-    useWallet,
-    useConnection,
-    useAnchorWallet,
-} from "@solana/wallet-adapter-react";
-import soonpad_idl from "@/utils/soonpad.json";
-import { NightlyWalletAdapter } from "@solana/wallet-adapter-wallets";
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    getAssociatedTokenAddress,
+    TOKEN_PROGRAM_ID,
+} from "@solana/spl-token";
 import {
     LAMPORTS_PER_SOL,
     PublicKey,
@@ -21,14 +18,15 @@ import {
     SystemProgram,
     SYSVAR_RENT_PUBKEY,
 } from "@solana/web3.js";
-import {
-    ASSOCIATED_TOKEN_PROGRAM_ID,
-    TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
-import { BN, Program } from "@coral-xyz/anchor";
+import React, { useEffect, useMemo, useState } from "react";
+
+import soonpad_idl from "@/utils/soonpad.json";
+import { AnchorProvider, BN, Program, setProvider } from "@coral-xyz/anchor";
 import { HelloAnchor } from "@/types/HelloAnchor";
-import { AnchorProvider } from "@project-serum/anchor";
-import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+
+const PROGRAM_ID = new PublicKey(
+    process.env.NEXT_PUBLIC_SOONPAD_PROGRAM_ID as string
+);
 
 interface FormData {
     project_token_name: string;
@@ -53,15 +51,13 @@ interface FormData {
     };
 }
 
-const PROGRAM_ID = new PublicKey(
-    process.env.NEXT_PUBLIC_SOONPAD_PROGRAM_ID as string
-);
-
-const CreateTokenLaunchPage: React.FC = () => {
-    const [program, setProgram] = useState<Program<HelloAnchor> | null>(null);
+export default function Page() {
+    const { publicKey, disconnect, connected, wallets, select, connecting } =
+        useWallet();
 
     const { connection } = useConnection();
     const wallet = useAnchorWallet();
+    const [program, setProgram] = useState<Program<HelloAnchor> | null>(null);
 
     const provider = useMemo(() => {
         if (!wallet) return null;
@@ -77,7 +73,7 @@ const CreateTokenLaunchPage: React.FC = () => {
             const program = new Program(
                 soonpad_idl as HelloAnchor,
                 PROGRAM_ID,
-                provider as any
+                provider
             );
             setProgram(program);
         }
@@ -113,24 +109,25 @@ const CreateTokenLaunchPage: React.FC = () => {
     ) => {
         const { name, value } = e.target;
 
+        // Check if the name corresponds to the whitelist field
         if (name === "whitelist_available") {
             setFormData((prevData) => ({
                 ...prevData,
-                [name]: value === "true",
+                [name]: value === "true", // Convert string to boolean
             }));
         } else if (name.startsWith("links.")) {
-            const linkField = name.split(".")[1];
+            const linkField = name.split(".")[1]; // Extract the link field (website, twitter, etc.)
             setFormData((prevData) => ({
                 ...prevData,
                 links: {
                     ...prevData.links,
-                    [linkField]: value,
+                    [linkField]: value, // Update the correct link field
                 },
             }));
         } else {
             setFormData((prevData) => ({
                 ...prevData,
-                [name]: value,
+                [name]: value, // Update top-level fields
             }));
         }
     };
@@ -148,11 +145,10 @@ const CreateTokenLaunchPage: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!wallet) {
+        if (!connected) {
             console.log("Please connect your wallet");
             return;
         }
-
         const removeEmptyValues = (obj: any): any => {
             if (Array.isArray(obj)) {
                 return obj.map(removeEmptyValues);
@@ -391,6 +387,7 @@ const CreateTokenLaunchPage: React.FC = () => {
                         onChange={handleChange}
                     />
                 </section>
+
                 <section className="flex flex-col w-full relative">
                     <label className="text-xs absolute top-[0.3rem] left-4 text-[#ffffff] text-opacity-55">
                         Project Token Symbol *
@@ -571,7 +568,7 @@ const CreateTokenLaunchPage: React.FC = () => {
                         </option>
                     </select>
                 </section>
-
+                
                 <div className="grid md:grid-cols-2 gap-4">
                     <div>
                         <label className="block mb-2 text-[#ffffff] text-opacity-55">
@@ -604,26 +601,5 @@ const CreateTokenLaunchPage: React.FC = () => {
                 </button>
             </form>
         </section>
-    );
-};
-
-export default function Page() {
-    const CUSTOM_RPC_ENDPOINT = "https://rpc.devnet.soo.network/rpc";
-
-    const endpoint = useMemo(() => CUSTOM_RPC_ENDPOINT, []);
-
-    const wallets = useMemo(() => [], []);
-
-    return (
-        // <WalletProvider wallets={wallets} autoConnect>
-        //     <CreateTokenLaunchPage />
-        // </WalletProvider>
-        <ConnectionProvider endpoint={endpoint}>
-            <WalletProvider wallets={wallets} autoConnect>
-                <WalletModalProvider>
-                    <CreateTokenLaunchPage />
-                </WalletModalProvider>
-            </WalletProvider>
-        </ConnectionProvider>
     );
 }
