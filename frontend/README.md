@@ -1,3 +1,21 @@
+# Project Deployment Notes
+
+## Local vs Vercel Deployment
+
+This project currently runs successfully on a local environment but encounters issues when deployed to Vercel.
+
+### Current Status
+- ✅ Local Development: Functioning correctly
+- ❌ Vercel Deployment: Experiencing problems
+
+### Next Steps
+- Investigating deployment compatibility
+- Identifying specific deployment blockers
+
+Please refer to link below for the secrets (.env).
+
+[Secret .env](https://github.com/peppyeben/repo/tree/main)
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
