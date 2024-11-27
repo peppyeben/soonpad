@@ -17,6 +17,8 @@
 //     return <CreateTokenLaunchForm />;
 // }
 
+"use client"
+
 import CreateTokenLaunchForm from "./components/create-token-launch-form";
 
 export default function CreatePage() {

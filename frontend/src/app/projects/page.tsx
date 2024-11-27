@@ -3,15 +3,13 @@
 import React, { useEffect, useState } from "react";
 import Launch from "./components/launch";
 
-export default function Page() {
-    const [programTokenLaunches, setProgramTokenLaunches] = useState([]);
+export default function Projects() {
+    const [programTokenLaunches, setProgramTokenLaunches] = useState<any[] | null>(null);
 
     useEffect(() => {
         async function getTokenLaunches() {
             const response = await fetch(
-                `${
-                    process.env.NEXT_PUBLIC_SOONPAD_BACKEND_API as string
-                }/launchpad`,
+                `${process.env.NEXT_PUBLIC_SOONPAD_BACKEND_API as string}/launchpad`,
                 {
                     method: "GET",
                     headers: {
@@ -34,18 +32,30 @@ export default function Page() {
                 const launchedTokens = responseData.tokenLaunches.filter(
                     (x: any) => x.token_launch_address
                 );
-                // console.log(launchedTokens);
                 setProgramTokenLaunches(launchedTokens);
+                console.log(launchedTokens);
             }
         }
 
         getTokenLaunches();
     }, []);
+
+    useEffect(() => {
+        if (programTokenLaunches && programTokenLaunches.length > 0) {
+            console.log(programTokenLaunches);
+        }
+    }, [programTokenLaunches]);
     return (
-        <section className="grid grid-cols-3 gap-6 rounded-lg p-6 shadow-lg bg-[#002900] text-[#CFFFCF]">
-            {[1, 2, 3, 4].map((x: any) => (
-                <Launch key={x} />
-            ))}
+        <section className="grid grid-cols-3 gap-6 rounded-lg p-6 shadow-lg bg-[#002900] text-[#CFFFCF] xl:grid-cols-4">
+            {programTokenLaunches && programTokenLaunches.length > 0 ? (
+                programTokenLaunches.map((launch: any, index: number) => (
+                    <Launch key={index} launch={launch}></Launch>
+                ))
+            ) : (
+                <>
+                    <p className="font-bold">Nothing here yet...</p>
+                </>
+            )}
         </section>
     );
 }
