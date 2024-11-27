@@ -1,16 +1,19 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import React, { useEffect, useMemo, useState } from "react";
 import { ImageUploader } from "@/components/image-uploader";
 import {
-    useWallet,
-    useAnchorWallet,
-    useConnection,
+    ConnectionProvider,
+    WalletProvider,
 } from "@solana/wallet-adapter-react";
 import {
-    ASSOCIATED_TOKEN_PROGRAM_ID,
-    getAssociatedTokenAddress,
-    TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
+    useWallet,
+    useConnection,
+    useAnchorWallet,
+} from "@solana/wallet-adapter-react";
+import soonpad_idl from "@/utils/soonpad.json";
+import { NightlyWalletAdapter } from "@solana/wallet-adapter-wallets";
 import {
     LAMPORTS_PER_SOL,
     PublicKey,
@@ -18,15 +21,14 @@ import {
     SystemProgram,
     SYSVAR_RENT_PUBKEY,
 } from "@solana/web3.js";
-import React, { useEffect, useMemo, useState } from "react";
-
-import soonpad_idl from "@/utils/soonpad.json";
-import { AnchorProvider, BN, Program, setProvider } from "@coral-xyz/anchor";
+import {
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
+} from "@solana/spl-token";
+import { BN, Program } from "@coral-xyz/anchor";
 import { HelloAnchor } from "@/types/HelloAnchor";
-
-const PROGRAM_ID = new PublicKey(
-    process.env.NEXT_PUBLIC_SOONPAD_PROGRAM_ID as string
-);
+import { AnchorProvider } from "@project-serum/anchor";
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 
 interface FormData {
     project_token_name: string;
@@ -51,13 +53,15 @@ interface FormData {
     };
 }
 
-export default function Page() {
-    const { publicKey, disconnect, connected, wallets, select, connecting } =
-        useWallet();
+const PROGRAM_ID = new PublicKey(
+    process.env.NEXT_PUBLIC_SOONPAD_PROGRAM_ID as string
+);
+
+export const CreateTokenLaunchPage: React.FC = () => {
+    const [program, setProgram] = useState<Program<HelloAnchor> | null>(null);
 
     const { connection } = useConnection();
     const wallet = useAnchorWallet();
-    const [program, setProgram] = useState<Program<HelloAnchor> | null>(null);
 
     const provider = useMemo(() => {
         if (!wallet) return null;
@@ -73,7 +77,7 @@ export default function Page() {
             const program = new Program(
                 soonpad_idl as HelloAnchor,
                 PROGRAM_ID,
-                provider
+                provider as any
             );
             setProgram(program);
         }
@@ -109,25 +113,24 @@ export default function Page() {
     ) => {
         const { name, value } = e.target;
 
-        // Check if the name corresponds to the whitelist field
         if (name === "whitelist_available") {
             setFormData((prevData) => ({
                 ...prevData,
-                [name]: value === "true", // Convert string to boolean
+                [name]: value === "true",
             }));
         } else if (name.startsWith("links.")) {
-            const linkField = name.split(".")[1]; // Extract the link field (website, twitter, etc.)
+            const linkField = name.split(".")[1];
             setFormData((prevData) => ({
                 ...prevData,
                 links: {
                     ...prevData.links,
-                    [linkField]: value, // Update the correct link field
+                    [linkField]: value,
                 },
             }));
         } else {
             setFormData((prevData) => ({
                 ...prevData,
-                [name]: value, // Update top-level fields
+                [name]: value,
             }));
         }
     };
@@ -145,10 +148,11 @@ export default function Page() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!connected) {
+        if (!wallet) {
             console.log("Please connect your wallet");
             return;
         }
+
         const removeEmptyValues = (obj: any): any => {
             if (Array.isArray(obj)) {
                 return obj.map(removeEmptyValues);
@@ -387,7 +391,6 @@ export default function Page() {
                         onChange={handleChange}
                     />
                 </section>
-
                 <section className="flex flex-col w-full relative">
                     <label className="text-xs absolute top-[0.3rem] left-4 text-[#ffffff] text-opacity-55">
                         Project Token Symbol *
@@ -568,7 +571,7 @@ export default function Page() {
                         </option>
                     </select>
                 </section>
-                
+
                 <div className="grid md:grid-cols-2 gap-4">
                     <div>
                         <label className="block mb-2 text-[#ffffff] text-opacity-55">
@@ -602,4 +605,4 @@ export default function Page() {
             </form>
         </section>
     );
-}
+};
